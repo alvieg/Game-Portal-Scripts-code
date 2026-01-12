@@ -1,0 +1,111 @@
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  position: relative;
+  width: 90%;
+  height: 90%;
+  margin: auto;
+  top: 5%;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-content iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 10;
+  font-size: 24px;
+  background: none;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Game buttons container */
+#game-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+/* Individual game button/card */
+.game-button {
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.game-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+}
+
+/* Game image */
+.game-img {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* square */
+  object-fit: cover;
+  display: block;
+}
+
+/* Game text */
+.game-name {
+  color: #fff;
+  font-weight: bold;
+  margin: 8px 0 4px;
+  font-size: 1rem;
+}
+
+.game-author {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+/* remove close button spacing if you had it before */
+.modal-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: flex-end; /* buttons on the right */
+  align-items: center;
+  padding: 0 12px;
+  box-sizing: border-box;
+  z-index: 10;
+  gap: 8px;
+}
+

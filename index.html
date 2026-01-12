@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <div id="game-buttons">
+        <!--<div class="game-button">
+          <img src="" alt="" class="game-img">
+          <p class="game-name"></p>
+          <p class="game-author"></p>
+        </div>-->
+      </div>
+      <div id="game-modal" class="modal hidden" onclick="clickOutsideClose(event)">
+        <div class="modal-content">
+          <div class="modal-topbar">
+            <button class="modal-fullscreen" onclick="toggleFullscreen()">⛶</button>
+            <button class="modal-newtab" onclick="openInNewTab()">↗</button>
+          </div>
+          <iframe id="game-iframe"></iframe>
+        </div>
+      </div>      
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
