@@ -5,51 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-      .modal {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      .modal-backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.7);
-      }
-
-      .modal-content {
-        position: relative;
-        width: 90%;
-        height: 90%;
-        margin: auto;
-        top: 5%;
-        background: #000;
-        border-radius: 12px;
-        overflow: hidden;
-      }
-
-      .modal-content iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-
-      .modal-close {
-        position: absolute;
-        top: 8px;
-        right: 12px;
-        z-index: 10;
-        font-size: 24px;
-        background: none;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-
       /* Game buttons container */
       #game-buttons {
         display: grid;
@@ -98,23 +53,6 @@
         font-size: 0.85rem;
         margin-bottom: 8px;
       }
-
-      /* remove close button spacing if you had it before */
-      .modal-topbar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: flex-end; /* buttons on the right */
-        align-items: center;
-        padding: 0 12px;
-        box-sizing: border-box;
-        z-index: 10;
-        gap: 8px;
-      }
     </style>
   </head>
   <body>
@@ -126,21 +64,6 @@
           <p class="game-author"></p>
         </div>-->
       </div>
-      <div
-        id="game-modal"
-        class="modal hidden"
-        onclick="clickOutsideClose(event)"
-      >
-        <div class="modal-content">
-          <div class="modal-topbar">
-            <button class="modal-fullscreen" onclick="toggleFullscreen()">
-              ⛶
-            </button>
-            <button class="modal-newtab" onclick="openInNewTab()">↗</button>
-          </div>
-          <iframe id="game-iframe"></iframe>
-        </div>
-      </div>
     </main>
     <script>
       const gameslink =
@@ -150,60 +73,13 @@
       const gameslistlink = `https://alvieg.github.io/game-portal-revival-assets/games.json`;
 
       const gameButtonsDiv = document.getElementById("game-buttons");
-      const modal = document.getElementById("game-modal");
-      const iframe = document.getElementById("game-iframe");
 
       let games = [];
-      let currentgame = "";
 
       async function fetchGames() {
         const res = await fetch(gameslistlink);
         if (!res.ok) throw new Error(res.status);
         games = await res.json();
-      }
-
-      async function openGameModal(url, name) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error(res.status);
-
-          let html = await res.text();
-          currentgame = html;
-
-          iframe.srcdoc = html;
-          modal.classList.remove("hidden");
-          document.body.style.overflow = "hidden";
-        } catch (e) {
-          console.error("Failed to load game:", e);
-        }
-      }
-
-      function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-          modal.requestFullscreen().catch((err) => console.error(err));
-        } else {
-          document.exitFullscreen();
-        }
-      }
-
-      function clickOutsideClose(e) {
-        // Only close if the click is directly on the modal background, not inside the content
-        if (e.target === e.currentTarget) {
-          closeGameModal();
-        }
-      }
-
-      function closeGameModal() {
-        iframe.srcdoc = "";
-        modal.classList.remove("visible");
-        document.body.style.overflow = "";
-      }
-
-      function closeGameModal() {
-        currentgame = "";
-        iframe.srcdoc = "";
-        modal.classList.add("hidden");
-        document.body.style.overflow = "";
       }
 
       function openInNewTab() {
@@ -234,14 +110,23 @@
             <p class="game-author">${game.author}</p>
           `;
 
-          button.onclick = () => {
+          button.onclick = async () => {
             if (!game.url) {
               console.error("Game missing URL:", game);
               return;
             }
 
             const gameUrl = game.url.replace("{HTML_URL}", gameslink);
-            openGameModal(gameUrl);
+            try {
+              const res = await fetch(gameUrl);
+              if (!res.ok) throw new Error(res.status);
+
+              let html = await res.text();
+              currentgame = html;
+              openInNewTab();
+            } catch (e) {
+              console.error("Failed to load game:", e);
+            }
           };
 
           gameButtonsDiv.appendChild(button);
