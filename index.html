@@ -291,9 +291,10 @@
       // Fullscreen toggle
       document.getElementById("fullscreen-modal").onclick = () => {
         const modalContent = document.querySelector(".modal-content");
+        const frame = document.getElementById("game-frame");
 
         if (!document.fullscreenElement) {
-          modalContent.requestFullscreen();
+          frame.requestFullscreen();
         } else {
           document.exitFullscreen();
         }
