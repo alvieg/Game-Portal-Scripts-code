@@ -145,6 +145,84 @@
         opacity: 0.8;
         margin-top: 40px;
       }
+
+      /* ============================================================
+         POPUP MODAL
+      ============================================================ */
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeBg 0.3s ease forwards;
+      }
+
+      @keyframes fadeBg {
+        from {
+          background: rgba(0, 0, 0, 0);
+        }
+        to {
+          background: rgba(0, 0, 0, 0.75);
+        }
+      }
+
+      .modal-content {
+        width: 90%;
+        height: 90%;
+        background: #000;
+        border-radius: 14px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid var(--accent);
+        box-shadow: 0 0 25px rgba(94, 231, 255, 0.4);
+        transform: scale(0.85);
+        opacity: 0;
+        animation: popupIn 0.35s ease forwards;
+      }
+
+      @keyframes popupIn {
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: flex-end;
+        background: #0f1429;
+        padding: 8px;
+        border-bottom: 1px solid #1a2340;
+      }
+
+      .modal-btn {
+        background: #1a2340;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        margin-left: 6px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s, transform 0.2s;
+      }
+
+      .modal-btn:hover {
+        background: #24315a;
+        transform: translateY(-2px);
+      }
+
+      #game-frame {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: black;
+      }
     </style>
   </head>
 
@@ -161,6 +239,17 @@
 
       <div id="game-buttons"></div>
     </main>
+
+    <!-- Popup Modal -->
+    <div id="game-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="fullscreen-modal" class="modal-btn">⛶</button>
+          <button id="close-modal" class="modal-btn">✕</button>
+        </div>
+        <iframe id="game-frame"></iframe>
+      </div>
+    </div>
 
     <script>
       const gameslink =
@@ -182,20 +271,33 @@
         games = await res.json();
       }
 
-      function openInNewTab() {
-        const win = window.open();
-        win.document.body.style.margin = "0";
-        win.document.body.style.height = "100vh";
+      function openPopup() {
+        const modal = document.getElementById("game-modal");
+        const frame = document.getElementById("game-frame");
 
-        const iframe = win.document.createElement("iframe");
-        iframe.style.border = "none";
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.srcdoc = currentgame;
-
-        win.document.body.appendChild(iframe);
-        window.close();
+        frame.srcdoc = currentgame;
+        modal.style.display = "flex";
       }
+
+      // Close popup
+      document.getElementById("close-modal").onclick = () => {
+        const modal = document.getElementById("game-modal");
+        const frame = document.getElementById("game-frame");
+
+        frame.srcdoc = "";
+        modal.style.display = "none";
+      };
+
+      // Fullscreen toggle
+      document.getElementById("fullscreen-modal").onclick = () => {
+        const modalContent = document.querySelector(".modal-content");
+
+        if (!document.fullscreenElement) {
+          modalContent.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      };
 
       function renderGamesButtons(filter = "") {
         gameButtonsDiv.innerHTML = "";
@@ -230,7 +332,7 @@
             const gameUrl = game.url.replace("{HTML_URL}", gameslink);
             const res = await fetch(gameUrl);
             currentgame = await res.text();
-            openInNewTab();
+            openPopup();
           };
 
           gameButtonsDiv.appendChild(button);
