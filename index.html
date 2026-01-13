@@ -3,78 +3,178 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Game Portal</title>
+
     <style>
-      /* Game buttons container */
-      #game-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 16px;
-        padding: 16px;
+      :root {
+        --bg: #0b0f1a;
+        --card: #11162a;
+        --accent: #5ee7ff;
+        --text: #ffffff;
+        --muted: #9aa4c7;
       }
 
-      /* Individual game button/card */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: radial-gradient(1200px 600px at top, #10172f, var(--bg));
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      main {
+        max-width: 1200px;
+        margin: auto;
+        padding: 24px;
+      }
+
+      /* ===== Search Bar ===== */
+      .search-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+
+      #search {
+        width: 100%;
+        max-width: 420px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: none;
+        outline: none;
+        background: #0f1429;
+        color: var(--text);
+        font-size: 1rem;
+        box-shadow: 0 0 0 0 var(--accent);
+        transition: box-shadow 0.3s, transform 0.2s;
+      }
+
+      #search::placeholder {
+        color: var(--muted);
+      }
+
+      #search:focus {
+        box-shadow: 0 0 0 2px var(--accent);
+        transform: translateY(-1px);
+      }
+
+      /* ===== Grid ===== */
+      #game-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 18px;
+      }
+
+      /* ===== Game Card ===== */
       .game-button {
-        background: #111;
-        border-radius: 12px;
+        position: relative;
+        aspect-ratio: 1 / 1;
+        border-radius: 16px;
         overflow: hidden;
         cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        transform: translateY(10px);
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
       }
 
       .game-button:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(94, 231, 255, 0.15);
       }
 
-      /* Game image */
+      @keyframes fadeIn {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* ===== Image ===== */
       .game-img {
         width: 100%;
-        aspect-ratio: 1 / 1; /* square */
+        height: 100%;
         object-fit: cover;
         display: block;
       }
 
-      /* Game text */
-      .game-name {
-        color: #fff;
-        font-weight: bold;
-        margin: 8px 0 4px;
-        font-size: 1rem;
+      /* ===== Hover Overlay ===== */
+      .game-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 14px;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.75),
+          rgba(0, 0, 0, 0.25),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
       }
 
-      .game-author {
-        color: #aaa;
-        font-size: 0.85rem;
-        margin-bottom: 8px;
+      .game-button:hover .game-overlay {
+        opacity: 1;
+      }
+
+      .overlay-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .overlay-author {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      /* ===== Empty State ===== */
+      .empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: var(--muted);
+        opacity: 0.8;
+        margin-top: 40px;
       }
     </style>
   </head>
+
   <body>
     <main>
-      <div id="game-buttons">
-        <!--<div class="game-button">
-          <img src="" alt="" class="game-img">
-          <p class="game-name"></p>
-          <p class="game-author"></p>
-        </div>-->
+      <div class="search-wrapper">
+        <input
+          id="search"
+          type="text"
+          placeholder="Search games..."
+          autocomplete="off"
+        />
       </div>
+
+      <div id="game-buttons"></div>
     </main>
+
     <script>
       const gameslink =
         "https://alvieg.github.io/game-portal-revival-assets/games";
       const imageslink =
         "https://alvieg.github.io/game-portal-revival-assets/images";
-      const gameslistlink = `https://alvieg.github.io/game-portal-revival-assets/games.json`;
+      const gameslistlink =
+        "https://alvieg.github.io/game-portal-revival-assets/games.json";
 
       const gameButtonsDiv = document.getElementById("game-buttons");
+      const searchInput = document.getElementById("search");
 
       let games = [];
+      let currentgame = "";
 
       async function fetchGames() {
         const res = await fetch(gameslistlink);
@@ -83,62 +183,67 @@
       }
 
       function openInNewTab() {
-        var win = window.open();
+        const win = window.open();
         win.document.body.style.margin = "0";
         win.document.body.style.height = "100vh";
-        var iframe = win.document.createElement("iframe");
+
+        const iframe = win.document.createElement("iframe");
         iframe.style.border = "none";
         iframe.style.width = "100%";
         iframe.style.height = "100%";
-        iframe.style.margin = "0";
         iframe.srcdoc = currentgame;
+
         win.document.body.appendChild(iframe);
+        window.close();
       }
 
-      function renderGamesButtons() {
+      function renderGamesButtons(filter = "") {
         gameButtonsDiv.innerHTML = "";
-        games.forEach((game) => {
+
+        const filtered = games.filter((g) =>
+          (g.name + g.author).toLowerCase().includes(filter.toLowerCase())
+        );
+
+        if (filtered.length === 0) {
+          gameButtonsDiv.innerHTML =
+            '<div class="empty">No games found</div>';
+          return;
+        }
+
+        filtered.forEach((game, i) => {
           const button = document.createElement("div");
           button.className = "game-button";
+          button.style.animationDelay = `${i * 30}ms`;
 
           const imglink = game.cover?.replace("{COVER_URL}", imageslink);
 
           button.innerHTML = `
-            <img src="${imglink}" class="game-img" loading="lazy">
-            <p class="game-name">${game.name}</p>
-            <p class="game-author">${game.author}</p>
+            <img src="${imglink}" class="game-img" loading="lazy" />
+            <div class="game-overlay">
+              <div class="overlay-name">${game.name}</div>
+              <div class="overlay-author">${game.author}</div>
+            </div>
           `;
 
           button.onclick = async () => {
-            if (!game.url) {
-              console.error("Game missing URL:", game);
-              return;
-            }
-
+            if (!game.url) return;
             const gameUrl = game.url.replace("{HTML_URL}", gameslink);
-            try {
-              const res = await fetch(gameUrl);
-              if (!res.ok) throw new Error(res.status);
-
-              let html = await res.text();
-              currentgame = html;
-              openInNewTab();
-            } catch (e) {
-              console.error("Failed to load game:", e);
-            }
+            const res = await fetch(gameUrl);
+            currentgame = await res.text();
+            openInNewTab();
           };
 
           gameButtonsDiv.appendChild(button);
         });
       }
 
+      searchInput.addEventListener("input", (e) => {
+        renderGamesButtons(e.target.value);
+      });
+
       (async () => {
-        try {
-          await fetchGames();
-          renderGamesButtons();
-        } catch (e) {
-          console.error(e);
-        }
+        await fetchGames();
+        renderGamesButtons();
       })();
     </script>
   </body>
