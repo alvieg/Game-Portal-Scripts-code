@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fullscreen Iframe</title>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    iframe {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+    }
+
+    .controls {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .control-btn:active {
+      transform: scale(0.96);
+    }
+
+    .control-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button class="control-btn" id="fullscreenBtn" title="Fullscreen">
+      <i data-lucide="maximize"></i>
+    </button>
+  </div>
+
+  <iframe
+    src="INSERTURLRIGHTHERE"
+    sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-popups"
+    allowfullscreen
+  ></iframe>
+
+  <script>
+    lucide.createIcons();
+
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+    fullscreenBtn.addEventListener("click", () => {
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        el.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Close window after 3 hours (3 * 60 * 60 * 1000)
+    setTimeout(() => {
+      window.close();
+
+      // Fallback if browser blocks it
+      setTimeout(() => {
+        document.body.innerHTML = "";
+        alert("Session expired.");
+      }, 500);
+    }, 3 * 60 * 60 * 1000);
+  </script>
+
+</body>
+</html>
